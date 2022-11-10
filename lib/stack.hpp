@@ -18,7 +18,10 @@
 #include <math.h>
 #include <time.h>
 
+
 #include "logs.hpp"
+
+#include "types/Elements/use_Element_ptr.hpp"
 #include "types/Stack.hpp"
 
 
@@ -38,7 +41,7 @@
     #define ASSERT_STACK_OK(x) if (stack_damaged (x)) { FSTACK_DUMP (x); LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
     #define ASSERT_STACK_OK_FOR_STACK_POP(x)\
-            if (stack_damaged (x)) { FSTACK_DUMP (x); LOG_ERROR (BAD_ARGS); if (return_code_ptr) { *return_code_ptr = BAD_ARGS; } return Element {NAN, true}; }
+            if (stack_damaged (x)) { FSTACK_DUMP (x); LOG_ERROR (BAD_ARGS); if (return_code_ptr) { *return_code_ptr = BAD_ARGS; } return Element {_poisoned_Element_value, true}; }
 
     #define STACK_ERROR_DUMP(x) FSTACK_DUMP(x)
 
@@ -48,7 +51,7 @@
     if (stack_damaged (x)) {                 LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
     #define ASSERT_STACK_OK_FOR_STACK_POP(x)\
-            if (stack_damaged (x)) {                  LOG_ERROR (BAD_ARGS); if (return_code_ptr) { *return_code_ptr = BAD_ARGS; } return Element {NAN, true}; }
+            if (stack_damaged (x)) {                  LOG_ERROR (BAD_ARGS); if (return_code_ptr) { *return_code_ptr = BAD_ARGS; } return Element {_poisoned_Element_value, true}; }
 
     #define STACK_ERROR_DUMP(x)
 
@@ -215,7 +218,7 @@ Return_code  _stack_resize  (Stack* stack, size_t new_capacity) {
     if (stack->elements == nullptr && new_capacity != 0) { LOG_ERROR (MEMORY_ERR); STACK_ERROR_DUMP (stack); return MEMORY_ERR; }
 
 
-    _stack_fill_with_poison (stack, stack->size, new_capacity); //
+    try (_stack_fill_with_poison (stack, stack->size, new_capacity));
 
 
     stack->capacity = new_capacity;
@@ -258,7 +261,7 @@ IF_CANARY_PROTECTED (
             canary_t second_canary_buffer = *( (canary_t*) stack->elements );
 
 
-            _stack_fill_with_poison (stack, 0, new_capacity - stack->capacity); //
+            try (_stack_fill_with_poison (stack, 0, new_capacity - stack->capacity));
 
 
             *( (canary_t*) (stack->elements + new_capacity - stack->capacity) ) = second_canary_buffer;
@@ -346,13 +349,13 @@ Element  stack_pop  (Stack* stack, Return_code* return_code_ptr) {
     ASSERT_STACK_OK_FOR_STACK_POP (stack);
 
 
-    Element return_element = {NAN, true};
+    Element return_element = {_poisoned_Element_value, true};
 
     if (stack->size != 0) {
 
         stack->size -= 1;
         return_element = stack->elements [stack->size];
-        stack->elements [stack->size] = Element {NAN, true};
+        stack->elements [stack->size] = Element {_poisoned_Element_value, true};
 
         IF_HASH_PROTECTED ( stack_recount_hash (stack); );
     }
@@ -367,7 +370,7 @@ Element  stack_pop  (Stack* stack, Return_code* return_code_ptr) {
             LOG_ERROR (resize_code);
             if (return_code_ptr) { *return_code_ptr = BAD_ARGS; }
             STACK_ERROR_DUMP (stack);
-            return Element {NAN, true};
+            return Element {_poisoned_Element_value, true};
         }
     }
 
@@ -492,7 +495,10 @@ void  _fstack_dump  (Stack* stack, const char* file_name, const char* file, cons
         if (i < stack->size) { fprintf (dump_file, "(in)  "); }
         else                 { fprintf (dump_file, "(out) "); }
 
-        fprintf (dump_file, "[%zd] = %-5lg (", i, stack->elements[i].value);
+        fprintf (dump_file, "[%zd] = "
+                            _ELEMENT_PRINT_FORMAT
+                            " (", i, stack->elements[i].value);
+
         if (stack->elements[i].poisoned) { fprintf (dump_file,     "poisoned)\n"); }
         else                             { fprintf (dump_file, "not poisoned)\n"); }
     }
@@ -578,12 +584,12 @@ IF_HASH_PROTECTED (
 
 Return_code _stack_fill_with_poison (Stack* stack, size_t from, size_t to) {
 
-    if (!stack || (to > stack->capacity) ) { LOG_ERROR (BAD_ARGS); STACK_ERROR_DUMP(stack); return BAD_ARGS; }
+    if (!stack) { LOG_ERROR (BAD_ARGS); STACK_ERROR_DUMP(stack); return BAD_ARGS; }
 
 
     for (size_t i = from; i < to; i++) {
 
-        stack->elements[i] = Element {NAN, true};
+        stack->elements[i] = Element {_poisoned_Element_value, true};
     }
 
 
@@ -602,5 +608,4 @@ Return_code _stack_fill_with_poison (Stack* stack, size_t from, size_t to) {
 
 
 #endif
-
 

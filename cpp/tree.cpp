@@ -1,7 +1,9 @@
 
 
-#include "../headers/tree.hpp"
+#include "../lib/stack.hpp"
 #include "../lib/logs.hpp"
+
+#include "../headers/tree.hpp"
 
 
 //static char GLOBAL_graph_dump_num [100] = "1";
@@ -193,6 +195,67 @@ void  _ftree_dump  (Tree* tree, const char* file_name, const char* file, const c
     first_time_dumping = false;
 }
 
+
+Return_code tree_iterator_inc (Tree_iterator* tree_iterator) {
+
+    if (!tree_iterator) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+
+    if (!tree_iterator->node_stack.size) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; } // already at last node
+
+
+
+    stack_pop (&tree_iterator->node_stack);
+
+    if (!tree_iterator->current->right_son) {
+
+        tree_iterator->current = (Node*) stack_pop (&tree_iterator->node_stack).value;
+        stack_push (&tree_iterator->node_stack, tree_iterator->current);
+        tree_iterator->depth -= 1;
+        tree_iterator->index += 1;
+        return SUCCESS;
+    }
+
+
+
+    tree_iterator->current = tree_iterator->current->right_son;
+    stack_push (&tree_iterator->node_stack, tree_iterator->current);
+    tree_iterator->depth += 1;
+
+    while (tree_iterator->current->left_son) {
+
+        tree_iterator->current = tree_iterator->current->left_son;
+        stack_push (&tree_iterator->node_stack, tree_iterator->current);
+        tree_iterator->depth += 1;
+    }
+
+    tree_iterator->index += 1;
+    return SUCCESS;
+}
+
+
+Return_code tree_iterator_ctor (Tree_iterator* tree_iterator, Tree* tree) {
+
+    if (!tree_iterator) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+
+
+    tree_iterator->current = tree->root;
+    stack_push (&tree_iterator->node_stack, tree_iterator->current);
+    tree_iterator->depth = 0;
+
+
+    while (tree_iterator->current->left_son) {
+
+        tree_iterator->current = tree_iterator->current->left_son;
+        stack_push (&tree_iterator->node_stack, tree_iterator->current);
+        tree_iterator->depth += 1;
+    }
+
+
+    tree_iterator->index = 1;
+
+
+    return SUCCESS;
+}
 /*
 void  _ftree_graphdump  (Tree* tree, const char* file_name, const char* file, const char* func, int line, const char* additional_text) {
 

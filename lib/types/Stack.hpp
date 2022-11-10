@@ -9,14 +9,15 @@
 
 
 
-#include "Element_ptr.hpp"
+#include "Elements/use_Element_ptr.hpp"
+#include "Elements/Element_ptr.hpp"
 //-------------------- SETTINGS --------------------
 #define ON_STACK_ERROR_DUMPING
 #define ON_STACK_AFTER_OPERATION_DUMPIN
 #define ON_CANARY_PROTECTION
 #define ON_HASH_PROTECTION
 
-#define stack_dump_file_name "dump.txt"
+#define stack_dump_file_name "work/dump.txt"
 
 const double stack_resize_coefficient = 2;
 //--------------------------------------------------

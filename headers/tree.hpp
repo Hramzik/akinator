@@ -18,8 +18,12 @@
 #include <math.h>
 #include <time.h>
 
+
+#include "../lib/types/Stack.hpp"
 #include "../lib/types/Return_code.hpp"
-#include "../lib/types/Element_const_str.hpp"
+
+#include "../lib/types/Elements/use_Element_const_str.hpp"
+#include "../lib/types/Elements/Element_const_str.hpp"
 
 
 //-------------------- SETTINGS --------------------
@@ -42,6 +46,7 @@ const size_t GRAPH_WIDTH = 1460;
 
 const size_t DEFAULT_COUNTING_SYSTEM = 10;
 //--------------------------------------------------
+
 
 
 #define  TREE_CTOR(x, ...)  _tree_ctor   (x, #x + (#x[0] == '&'), __FILE__, __PRETTY_FUNCTION__, __LINE__, __VA_ARGS__)
@@ -75,6 +80,7 @@ const size_t DEFAULT_COUNTING_SYSTEM = 10;
 #else
     #define TREE_AFTER_OPERATION_DUMPING(x)
 #endif
+
 
 
 typedef int Tree_state;
@@ -122,12 +128,12 @@ const size_t TREE_SIZE = sizeof (Tree);
 typedef struct Tree_iterator_structure Tree_iterator;
 struct         Tree_iterator_structure  {
 
-    size_t num;
-    Node*  cur;
+    Node*  current;
+    size_t index;
+    size_t depth;
+    Stack  node_stack;
 };
 
-
-const size_t NODE_SIZE = sizeof (Node);
 
 
 Return_code _tree_ctor          (Tree* tree, const char* name, const char* file, const char* func, int line, Element_value root_str = nullptr);
@@ -145,6 +151,9 @@ void       _ftree_graphdump                  (Tree* tree, const char* file_name,
 void        tree_show_graph_dump             (void);
 void        tree_generate_graph_describtion  (Tree* tree);
 void        tree_generate_graph              (void);
+
+Return_code tree_iterator_inc  (Tree_iterator* tree_iterator);
+Return_code tree_iterator_ctor (Tree_iterator* tree_iterator, Tree* tree);
 
 
 
