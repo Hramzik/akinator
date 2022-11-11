@@ -17,7 +17,7 @@
 #define ON_CANARY_PROTECTION
 #define ON_HASH_PROTECTION
 
-#define stack_dump_file_name "work/dump.txt"
+#define stack_dump_file_name "work/stack_dump.txt"
 
 const double stack_resize_coefficient = 2;
 //--------------------------------------------------

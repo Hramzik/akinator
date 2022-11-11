@@ -18,15 +18,7 @@
 
 
 #define log_file_name "work/logs.txt"
-#define LOG_ERROR(code)      _log_error   (code,    __FILE__, __PRETTY_FUNCTION__, __LINE__)
 #define LOG_MESSAGE(message) _log_message (message, __FILE__, __PRETTY_FUNCTION__, __LINE__)
-
-
-#define try(x) {\
-\
-    Return_code _return_code_try_special = x;\
-    if (_return_code_try_special) { LOG_ERROR (_return_code_try_special); return _return_code_try_special; }\
-}
 
 
 
