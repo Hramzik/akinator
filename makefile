@@ -26,5 +26,8 @@ akn:
 tree:
 	$(call compile, $(cppfolder)/maintree.cpp, $(cppfolder)/tree.cpp, $(default_path))
 
+testtree:
+	$(call compile, $(cppfolder)/testtree.cpp, $(cppfolder)/tree.cpp, $(default_path))
+
 test:
 	$(call compile, $(cppfolder)/test.cpp, , $(default_path))

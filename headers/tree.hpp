@@ -56,15 +56,15 @@ const size_t DEFAULT_COUNTING_SYSTEM = 10;
 
 
 #define  TREE_CTOR(x, root_value)  _tree_ctor   (x, #x + (#x[0] == '&'), __FILE__, __PRETTY_FUNCTION__, __LINE__, root_value)
-#define FTREE_DUMP(x)       _ftree_dump  (x, tree_dump_file_name, __FILE__, __PRETTY_FUNCTION__, __LINE__)
+#define FTREE_DUMP(x)              _ftree_dump  (x, tree_dump_file_name, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 
 
 #define FTREE_GRAPHDUMP(x, ...)\
 \
-    tree_generate_graph_describtion (x);\
-    tree_generate_graph ();\
-    _ftree_graphdump (x, tree_graph_dump_file_name, __FILE__, __PRETTY_FUNCTION__, __LINE__, __VA_ARGS__);\
-    tree_show_graph_dump ()
+    _tree_generate_graph_describtion (x);\
+    _tree_generate_graph             ();\
+    _ftree_graphdump                 (x, tree_graph_dump_file_name, __FILE__, __PRETTY_FUNCTION__, __LINE__, __VA_ARGS__);\
+    _tree_show_graph_dump            ()
 
 
 #ifdef ON_TREE_ERROR_DUMPING
@@ -105,6 +105,16 @@ enum User_answer {
     UA_FALSE = 0,
     UA_TRUE  = 1,
     UA_UNDEF = 2,
+};
+
+
+enum Akinator_mode {
+
+    AK_GUESS   = 0,
+    AK_DEFINE  = 1,
+    AK_COMPARE = 2,
+    AK_DUMP    = 3,
+    AK_UNKNOWN = 4,
 };
 
 
@@ -155,8 +165,9 @@ struct         Tree_iterator_structure  {
 typedef struct Entity_trait_struct Entity_trait;
 struct         Entity_trait_struct {
 
-    char* trait;
-    bool  has_it;
+    const char* trait;
+    bool        has_it;
+    bool        have_both;
 };
 const size_t ENTITY_TRAIT_SIZE = sizeof (Entity_trait);
 
@@ -187,10 +198,10 @@ Return_code _fdump_nodes                     (FILE* dump_file, Tree* tree, const
 Return_code _fprint_node                     (FILE* file, Node* node, size_t depth);
 void        _fprint_tabs                     (FILE* file, size_t num);
 void        _ftree_graphdump                 (Tree* tree, const char* file_name, const char* file, const char* func, int line, const char* additional_text = "");
-void         tree_show_graph_dump            (void);
-void         tree_generate_graph_describtion (Tree* tree);
+void         _tree_show_graph_dump            (void);
+void         _tree_generate_graph_describtion (Tree* tree);
 void         tree_generate_nodes_describtion (Tree* tree, FILE* file);
-void         tree_generate_graph             (void);
+void         _tree_generate_graph             (void);
 
 Return_code  tree_save (Tree* tree, const char* file_name = tree_default_save_file_name);
 Return_code  tree_read (Tree* tree, const char* file_name = tree_default_save_file_name);
@@ -225,9 +236,23 @@ Return_code  akinator_compare_mode           (void);
 void         akinator_compare_mode_greetings (void);
 void         akinator_compare_mode_out       (Stack* stack);
 
+Return_code akinator_dump_mode (void);
+
+
+Return_code   akinator_start      (void);
+void          akinator_greetings  (void);
+Akinator_mode get_akinator_mode   (void);
+Akinator_mode reget_akinator_mode (void);
+
+
 bool _ispositive (const char* answer);
 bool _isnegative (const char* answer);
 bool _isleaf     (Node* node);
+
+Return_code entity_definition_ctor    (Entity_definition* entity_definition, Stack* stack);
+Return_code entity_definition_dtor    (Entity_definition* entity_definition);
+Return_code entity_definition_builder (Entity_definition* entity_definition, Tree* tree, char* character);
+
 
 
 

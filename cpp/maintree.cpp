@@ -5,16 +5,11 @@
 
 int main (void) {
 
-    Tree tree = {};
-    TREE_CTOR (&tree, nullptr);
-    tree_read (&tree);
+    //AKINATOR START
 
 
-    akinator_define_mode ();
-
-    // FTREE_GRAPHDUMP (&tree, "first dump");
+    printf ("%d\n\n", akinator_start ());
 
 
-    printf ("0");
     return 0;
 }

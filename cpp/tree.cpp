@@ -62,6 +62,8 @@ Return_code  _node_dtor  (Node* node) {
 
     return SUCCESS;
 }
+
+
 Return_code  tree_push_left  (Tree* tree, Node* node, Element_value new_element_value) {
 
     if (!tree || !node) { LOG_ERROR (BAD_ARGS); FTREE_DUMP (tree); return BAD_ARGS; };
@@ -845,7 +847,6 @@ Return_code  akinator_define_mode  (void) {
         if (!stricmp (character, tree_iterator.current->element.value)) {
 
             akinator_define_mode_out (tree_iterator.node_stack);
-            entity_definition_ctor (tree_iterator.node_stack);
             tree_iterator_dtor (&tree_iterator);
             return SUCCESS;
         }
@@ -880,25 +881,28 @@ void  akinator_define_mode_out  (Stack* stack) {
     printf ("\n\n");
 
 
-    Node* current_question = (Node*) stack_pop (stack).value;
-    const char* character = current_question->element.value;
-    Node* old_question     = nullptr;
-    while (true) {
+    Node* character_node = (Node*) stack_pop (stack).value;
+    stack_push (stack, character_node);
+    const char* character = character_node->element.value;
 
-        old_question = current_question;
-        current_question = (Node*) stack_pop (stack).value;
 
-        if (!current_question) { break; }
+    Entity_definition character_definition = {};
+    entity_definition_ctor (&character_definition, stack);
 
-        if (current_question->left_son == old_question) { printf ("%s doesn't %s\n\n", character, current_question->element.value); }
-        else                                            { printf ("%s does %s\n\n",    character, current_question->element.value); }
+    for (size_t i = 0; i < character_definition.num_traits; i++) {
+    
+        if (character_definition.traits_array [i].has_it) { printf ("%s does %s\n\n",       character, character_definition.traits_array [i].trait); }
+        else                                              { printf ("%s doesn't %s\n\n",    character, character_definition.traits_array [i].trait); }
     }
+
+
+    entity_definition_dtor (&character_definition);  
 }
 
 
 Return_code  entity_definition_ctor  (Entity_definition* entity_definition, Stack* stack) {
 
-    assert (stack);
+    if (!entity_definition || !stack) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
     entity_definition->traits_array = (Entity_trait*) calloc ((stack->size - 1) * ENTITY_TRAIT_SIZE, 1);
@@ -906,7 +910,6 @@ Return_code  entity_definition_ctor  (Entity_definition* entity_definition, Stac
 
 
     Node* current_question = (Node*) stack_pop (stack).value;
-    const char* character = current_question->element.value;
     Node* old_question     = nullptr;
     size_t i = 0;
     while (true) {
@@ -916,12 +919,29 @@ Return_code  entity_definition_ctor  (Entity_definition* entity_definition, Stac
 
         if (!current_question) { break; }
 
-        if (current_question->left_son == old_question) { entity_definition->traits_array [i] = { current_question->element.value, false }; }
-        else                                            { entity_definition->traits_array [i] = { current_question->element.value, true  }; }
+        if (current_question->left_son == old_question) { entity_definition->traits_array [i] = { current_question->element.value, false, false }; }
+        else                                            { entity_definition->traits_array [i] = { current_question->element.value, true , false }; }
 
         i++;
     }
+
+
+    return SUCCESS;
 }
+
+
+Return_code  entity_definition_dtor  (Entity_definition* entity_definition) {
+
+    if (!entity_definition) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+
+
+    free (entity_definition->traits_array);
+
+
+    return SUCCESS;
+}
+
+
 void  _ftree_graphdump  (Tree* tree, const char* file_name, const char* file, const char* func, int line, const char* additional_text) {
 
     assert ( (file_name) && (file) && (func) && (line > 0) );
@@ -1008,7 +1028,7 @@ void  _ftree_graphdump  (Tree* tree, const char* file_name, const char* file, co
 }
 
 
-void  tree_show_graph_dump  (void) {
+void  _tree_show_graph_dump  (void) {
 
     char command [MAX_COMMAND_LEN] = "start ";
     strcat (command, tree_graph_dump_file_name);
@@ -1017,7 +1037,7 @@ void  tree_show_graph_dump  (void) {
 }
 
 
-void  tree_generate_graph_describtion  (Tree* tree) {
+void  _tree_generate_graph_describtion  (Tree* tree) {
 
     if (!tree) { return; }
 
@@ -1115,7 +1135,7 @@ void tree_generate_nodes_describtion (Tree* tree, FILE* file) {
 }
 
 
-void  tree_generate_graph  (void) {
+void  _tree_generate_graph  (void) {
 
     char command [MAX_COMMAND_LEN] = "dot -Tsvg ";
     strcat (command, tree_graph_describtion_file_name);
@@ -1152,7 +1172,233 @@ size_t  tree_depth  (Tree* tree) {
 
 Return_code  akinator_compare_mode  (void) {
 
+    akinator_compare_mode_greetings ();
+
+
+    char character1 [MAX_ANSWER_LEN + 1] = "";
+    gets (character1);
+    Entity_definition character1_definition = {nullptr, 0};
+
+    char character2 [MAX_ANSWER_LEN + 1] = "";
+    gets (character2);
+    Entity_definition character2_definition = {nullptr, 0};
+
+
+
+    Tree tree = {};
+    TREE_CTOR (&tree, nullptr);
+    tree_read (&tree);
+
+
+    try ( entity_definition_builder (&character1_definition, &tree, character1) );
+    try ( entity_definition_builder (&character2_definition, &tree, character2) );
+
+
+    for (size_t i = 0; i < character1_definition.num_traits; i++) {
     
+        for (size_t j = 0; j < character2_definition.num_traits; j++) {
+        
+            if ( character1_definition.traits_array[i].has_it == character2_definition.traits_array[j].has_it && 
+                !strcmp (character1_definition.traits_array[i].trait, character2_definition.traits_array[j].trait)) {
+
+                    character1_definition.traits_array[i].have_both = true;
+                    character2_definition.traits_array[j].have_both = true;
+            }
+        }
+    }
+
+    printf ("\n\n--------------------------------------\n");
+    printf ("both %s and %s:\n\n", character1, character2);
+
+    for (size_t i = 0; i < character1_definition.num_traits; i++) {
+    
+        if (!character1_definition.traits_array[i].have_both) { continue; }
+
+
+        if (character1_definition.traits_array[i].has_it) { printf ("do "); }
+        else                                              { printf ("don't "); }
+
+        printf ("%s\n\n", character1_definition.traits_array[i].trait);
+    }
+
+
+    if (character1_definition.num_traits) {
+
+        printf ("but %s:\n\n", character1);
+        for (size_t i = 0; i < character1_definition.num_traits; i++) {
+
+            if (character1_definition.traits_array[i].have_both) { continue; }
+
+            if (character1_definition.traits_array[i].has_it) { printf ("does "); }
+            else                                              { printf ("doesn't "); }
+
+            printf ("%s\n\n", character1_definition.traits_array[i].trait);
+        }
+    }
+
+
+    if (character2_definition.num_traits) {
+
+        printf ("and %s:\n\n", character2);
+        for (size_t i = 0; i < character2_definition.num_traits; i++) {
+
+            if (character2_definition.traits_array[i].have_both) { continue; }
+
+            if (character2_definition.traits_array[i].has_it) { printf ("does "); }
+            else                                              { printf ("doesn't "); }
+
+            printf ("%s\n\n", character2_definition.traits_array[i].trait);
+        }
+    }
+
+    entity_definition_dtor (&character1_definition);
+    entity_definition_dtor (&character2_definition);
+
+
+    return SUCCESS;
 }
-void  akinator_compare_mode_greetings  (void);
-void  akinator_compare_mode_out  (Stack* stack);
+
+
+Return_code  entity_definition_builder (Entity_definition* entity_definition, Tree* tree, char* character) {
+
+    if (!entity_definition || !tree || !character) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+
+
+    Tree_iterator tree_iterator = {};
+    tree_iterator_ctor (&tree_iterator, tree, "pre");
+
+    do {
+
+        if (!_isleaf (tree_iterator.current)) { continue; }
+
+        if (!stricmp (character, tree_iterator.current->element.value)) {
+
+            entity_definition_ctor (entity_definition, tree_iterator.node_stack);
+        }
+    }
+    while (!tree_iterator_inc (&tree_iterator));
+
+
+    tree_iterator_dtor (&tree_iterator);
+
+
+    if (entity_definition->num_traits == 0) { printf ("\n\nunfortunately, i don't know who %s is\n\n", character); return BAD_ARGS; }
+
+
+    for (size_t i = 0; i < entity_definition->num_traits; i++) {
+    
+        printf ("%s - %d %s\n", character, entity_definition->traits_array [i].has_it, entity_definition->traits_array [i].trait);
+    }
+    
+    
+    return SUCCESS;
+}
+
+
+void  akinator_compare_mode_greetings  (void) {
+
+    printf ("\n");
+    printf ("--------------------------------------\n");
+    printf ("Enter two entities, i'll compare them!\n");
+    printf ("--------------------------------------\n\n");
+}
+
+
+Return_code akinator_dump_mode (void) {
+
+    Tree tree = {};
+    try (TREE_CTOR (&tree, nullptr));
+    try (tree_read (&tree));
+
+
+    printf ("\n");
+    FTREE_GRAPHDUMP (&tree, "Here is your dump:");
+    printf ("\n");
+
+
+    try (tree_dtor (&tree));
+
+
+    return SUCCESS;
+}
+
+
+Return_code akinator_start (void) {
+
+    akinator_greetings ();
+
+    Akinator_mode mode = get_akinator_mode ();
+
+    switch (mode) {
+
+        case AK_GUESS:
+
+            try (akinator_guess_mode ());
+            break;
+
+        case AK_DEFINE:
+
+            try (akinator_define_mode ());
+            break;
+
+        case AK_COMPARE:
+
+            try (akinator_compare_mode ());
+            break;
+
+        case AK_DUMP:
+
+            try (akinator_dump_mode ());
+            break;
+
+        case AK_UNKNOWN:
+
+            return SUCCESS;
+
+        default:
+
+            return SUCCESS;
+    }
+
+
+    return SUCCESS;
+}
+
+
+void akinator_greetings (void) {
+
+    printf ("\nWelcome to the akinator.\nChoose one of the following modes:\n\n");
+    printf ("[g]uess\n\n");
+    printf ("[d]efine\n\n");
+    printf ("[c]ompare\n\n");
+    printf ("[b]ase dump\n\n");
+}
+
+Akinator_mode get_akinator_mode (void) {
+
+    char mode    [MAX_COMMAND_LEN + 1] = "";
+    char entered [MAX_ANSWER_LEN + 1] = "";
+    char should_be_blank [2] = "";
+
+    gets (entered);
+    sscanf (entered, "%s %1s", mode, should_be_blank);
+
+    if (strcmp (should_be_blank, "")) { return reget_akinator_mode (); }
+
+    if (!stricmp (mode, "g") || !stricmp (mode, "guess"))                                    { return AK_GUESS; }
+    if (!stricmp (mode, "d") || !stricmp (mode, "define"))                                   { return AK_DEFINE; }
+    if (!stricmp (mode, "c") || !stricmp (mode, "compare"))                                  { return AK_COMPARE; }
+    if (!stricmp (mode, "b") || !stricmp (mode, "base dump") || !stricmp (mode, "basedump")) { return AK_DUMP; }
+
+
+    return reget_akinator_mode ();
+}
+
+Akinator_mode reget_akinator_mode (void) {
+
+    printf ("\n\nwrong input, please re-enter akinator mode\n\n");
+
+
+    return get_akinator_mode ();
+}
+
