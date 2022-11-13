@@ -512,6 +512,9 @@ Return_code  tree_read  (Tree* tree, const char* file_name) {
     _node_read (file, tree, tree->root);
 
 
+    fclose (file);
+
+
     return SUCCESS;
 }
 
