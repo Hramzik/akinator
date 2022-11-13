@@ -1,0 +1,27 @@
+--------------------
+Dumping tree at cpp/testtree.cpp in function int main() (line 15)...
+
+this tree has name tree [000000000063fdf0]
+it was created in file cpp/testtree.cpp
+in function int main() (line 12)
+
+tree is ok
+root [00000000006f6b20].
+
+nodes:
+
+
+pre-order:
+
+[0] = UNITIALIZED_STRING (depth 0)
+
+
+in-order:
+
+[0] = UNITIALIZED_STRING (depth 0)
+
+
+as in save file:
+
+{UNITIALIZED_STRING}
+

@@ -1,0 +1,22 @@
+{consider himself a human being
+    {get eaten by people
+        {poltorashka}
+        {shaurma}
+    }
+    {teach at mipt
+        {vlad z}
+        {teach computer science
+            {sing songs
+                {teach seminars
+                    {shtepin}
+                    {teach calculus
+                        {bogdanov}
+                        {redkozubov}
+                    }
+                }
+                {ovchinkin}
+            }
+            {ded}
+        }
+    }
+}
