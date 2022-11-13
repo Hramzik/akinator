@@ -253,6 +253,10 @@ Return_code  _tree_iterator_inc_in_order  (Tree_iterator* tree_iterator) {
         return SUCCESS;
     }
 
+
+    if (tree_iterator->depth == 0) { return BAD_ARGS; } //дошли до корня, справа нет узлов
+
+
     Node* old = tree_iterator->current;
     stack_pop (tree_iterator->node_stack);
     tree_iterator->current = (Node*) stack_pop (tree_iterator->node_stack).value;
@@ -633,6 +637,7 @@ void  akinator_guess_mode_greetings  (void)  {
     printf ("-------------------------------------------\n");
     printf ("Think of an entity, i will try to guess it!\n");
     printf ("-------------------------------------------\n");
+    speak  ("Think of an entity, i will try to guess it!");
 }
 
 
@@ -642,6 +647,7 @@ Return_code  akinator_guess_mode_ask  (const char* question) {
 
 
     printf ("\ndoes your character %s?\n\n", question);
+    speak  ("does your character %s?", question);
 
 
     return SUCCESS;
@@ -698,6 +704,7 @@ bool  _isnegative  (const char* answer) {
 void  akinator_guess_mode_bad_answer_message  (void) {
 
     printf ("\ni couldn't understand your answer... \n\ntype 'y' for yes, 'n' for no\n\n");
+    speak  ("i couldn't understand your answer");
 }
 
 
@@ -707,6 +714,7 @@ bool  akinator_guess_mode_check_answer  (const char* answer_string) {
 
 
     printf ("\nis your character %s?\n\n", answer_string);
+    speak  ("is your character %s?", answer_string);
 
     User_answer answer = akinator_guess_mode_get_answer ();
     switch (answer) {
@@ -737,10 +745,12 @@ void  akinator_guess_mode_win_message  (void) {
     if (POLITE_MODE) {
 
         printf ("\nmy calculations are always correct!\n\n");
+        speak ("my calculations are always correct!");
     }
 
     else {
         printf ("\nGG EZ GET F***ED LMAO\n\n");
+        speak ("GG EASY GET FUCKED LMAO");
     }
 }
 
@@ -750,10 +760,12 @@ void  akinator_guess_mode_lose_message  (void) {
     if (POLITE_MODE) {
 
         printf ("\nkeep your secrets...\n\n");
+        speak  ("\nkeep your secrets...");
     }
 
     else {
         printf ("\nno one cares, lol. who asked? +ratio\n\n");
+        speak  ("no one cares, lol. who asked? +ratio");
     }
 }
 
@@ -761,6 +773,7 @@ void  akinator_guess_mode_lose_message  (void) {
 Return_code  akinator_guess_mode_add_to_base  (Tree* tree, Node* answer_node) {
 
     printf ("\nwho is your character?\n\n");
+    speak  ("who is your character?");
 
 
     char character [MAX_ANSWER_LEN + 1] = "";
@@ -771,6 +784,7 @@ Return_code  akinator_guess_mode_add_to_base  (Tree* tree, Node* answer_node) {
     tree_push_right (tree, answer_node, character);
 
     printf ("\nwhat does %s different of %s?\n\n", character, answer_node->element.value);
+    speak  ("what does %s different of %s?", character, answer_node->element.value);
 
 
     char difference [MAX_ANSWER_LEN + 1] = "";
@@ -785,10 +799,12 @@ Return_code  akinator_guess_mode_add_to_base  (Tree* tree, Node* answer_node) {
     if (POLITE_MODE) {
 
         printf ("\nnext time i'll be stronger\n\n");
+        speak  ("next time i'll be stronger");
     }
 
     else {
         printf ("\nnext time i'll beat you'r m/f a**\n\n");
+        speak  ("next time i'll beat you'r motherfucking ass");
     }
 
     return SUCCESS;
@@ -797,7 +813,8 @@ Return_code  akinator_guess_mode_add_to_base  (Tree* tree, Node* answer_node) {
 
 bool  akinator_guess_mode_ask_to_add  (void) {
 
-    printf ("\nwould you like to add your character to base?\n\n");
+    printf ("\nwould you like to add your character to the base?\n\n");
+    speak  ("would you like to add your character to the base?");
 
     User_answer answer = akinator_guess_mode_get_answer ();
     switch (answer) {
@@ -854,7 +871,8 @@ Return_code  akinator_define_mode  (void) {
     while (!tree_iterator_inc (&tree_iterator));
 
 
-    printf ("\n\nunfortunately, i don't know who %s is\n\n", character);
+    printf ("\nunfortunately, i don't know who %s is\n\n", character);
+    speak  ("unfortunately, i don't know who %s is", character);
 
 
     tree_iterator_dtor (&tree_iterator);
@@ -869,7 +887,8 @@ void  akinator_define_mode_greetings  (void)  {
     printf ("\n");
     printf ("--------------------------------\n");
     printf ("Enter an entity, i'll define it!\n");
-    printf ("--------------------------------\n\n");
+    printf ("--------------------------------\n\n>> ");
+    speak ("Enter an entity, i'll define it!");
 }
 
 
@@ -878,7 +897,7 @@ void  akinator_define_mode_out  (Stack* stack) {
     assert (stack);
 
 
-    printf ("\n\n");
+    printf ("\n");
 
 
     Node* character_node = (Node*) stack_pop (stack).value;
@@ -891,8 +910,17 @@ void  akinator_define_mode_out  (Stack* stack) {
 
     for (size_t i = 0; i < character_definition.num_traits; i++) {
     
-        if (character_definition.traits_array [i].has_it) { printf ("%s does %s\n\n",       character, character_definition.traits_array [i].trait); }
-        else                                              { printf ("%s doesn't %s\n\n",    character, character_definition.traits_array [i].trait); }
+        if (character_definition.traits_array [i].has_it) {
+
+            printf ("%s does %s\n\n", character, character_definition.traits_array [i].trait);
+            speak  ("%s does %s", character, character_definition.traits_array [i].trait);
+        }
+
+        else {
+
+            printf ("%s doesn't %s\n\n", character, character_definition.traits_array [i].trait);
+            speak  ("%s doesn't %s", character, character_definition.traits_array [i].trait);
+        }
     }
 
 
@@ -1086,7 +1114,9 @@ void tree_generate_nodes_describtion (Tree* tree, FILE* file) {
     assert (tree && file);
 
 
-    for (size_t depth = 0; depth <= tree_depth (tree); depth++) {
+    size_t given_tree_depth = tree_depth (tree);
+
+    for (size_t depth = 0; depth <= given_tree_depth; depth++) {
 
         size_t on_level_index   = 0;
         size_t next_level_index = 0;
@@ -1179,6 +1209,8 @@ Return_code  akinator_compare_mode  (void) {
     gets (character1);
     Entity_definition character1_definition = {nullptr, 0};
 
+    printf (">> ");
+
     char character2 [MAX_ANSWER_LEN + 1] = "";
     gets (character2);
     Entity_definition character2_definition = {nullptr, 0};
@@ -1207,32 +1239,49 @@ Return_code  akinator_compare_mode  (void) {
         }
     }
 
-    printf ("\n\n--------------------------------------\n");
+    printf ("\n--------------------------------------\n");
     printf ("both %s and %s:\n\n", character1, character2);
+    speak  ("both %s and %s:",     character1, character2);
 
     for (size_t i = 0; i < character1_definition.num_traits; i++) {
     
         if (!character1_definition.traits_array[i].have_both) { continue; }
 
 
-        if (character1_definition.traits_array[i].has_it) { printf ("do "); }
-        else                                              { printf ("don't "); }
+        if (character1_definition.traits_array[i].has_it) {
 
-        printf ("%s\n\n", character1_definition.traits_array[i].trait);
+                printf ("do %s\n\n", character1_definition.traits_array[i].trait);
+                speak  ("do %s",     character1_definition.traits_array[i].trait);
+            }
+
+            else {
+
+                printf ("don't %s\n\n", character1_definition.traits_array[i].trait);
+                speak  ("don't %s",     character1_definition.traits_array[i].trait);
+            }
     }
 
 
     if (character1_definition.num_traits) {
 
         printf ("but %s:\n\n", character1);
+        speak  ("but %s",      character1);
+
         for (size_t i = 0; i < character1_definition.num_traits; i++) {
 
             if (character1_definition.traits_array[i].have_both) { continue; }
 
-            if (character1_definition.traits_array[i].has_it) { printf ("does "); }
-            else                                              { printf ("doesn't "); }
+            if (character1_definition.traits_array[i].has_it) {
 
-            printf ("%s\n\n", character1_definition.traits_array[i].trait);
+                printf ("does %s\n\n", character1_definition.traits_array[i].trait);
+                speak  ("does %s",     character1_definition.traits_array[i].trait);
+            }
+
+            else {
+
+                printf ("doesn't %s\n\n", character1_definition.traits_array[i].trait);
+                speak  ("doesn't %s",     character1_definition.traits_array[i].trait);
+            }
         }
     }
 
@@ -1240,14 +1289,23 @@ Return_code  akinator_compare_mode  (void) {
     if (character2_definition.num_traits) {
 
         printf ("and %s:\n\n", character2);
+        speak  ("and %s",      character2);
+
         for (size_t i = 0; i < character2_definition.num_traits; i++) {
 
             if (character2_definition.traits_array[i].have_both) { continue; }
 
-            if (character2_definition.traits_array[i].has_it) { printf ("does "); }
-            else                                              { printf ("doesn't "); }
+            if (character2_definition.traits_array[i].has_it) {
 
-            printf ("%s\n\n", character2_definition.traits_array[i].trait);
+                printf ("does %s\n\n", character2_definition.traits_array[i].trait);
+                speak  ("does %s",     character2_definition.traits_array[i].trait);
+            }
+
+            else {
+
+                printf ("doesn't %s\n\n", character2_definition.traits_array[i].trait);
+                speak  ("doesn't %s",     character2_definition.traits_array[i].trait);
+            }
         }
     }
 
@@ -1282,15 +1340,15 @@ Return_code  entity_definition_builder (Entity_definition* entity_definition, Tr
     tree_iterator_dtor (&tree_iterator);
 
 
-    if (entity_definition->num_traits == 0) { printf ("\n\nunfortunately, i don't know who %s is\n\n", character); return BAD_ARGS; }
+    if (entity_definition->num_traits == 0) {
 
+        printf ("\nunfortunately, i don't know who %s is\n\n", character);
+        speak  ("unfortunately, i don't know who %s is",       character);
 
-    for (size_t i = 0; i < entity_definition->num_traits; i++) {
-    
-        printf ("%s - %d %s\n", character, entity_definition->traits_array [i].has_it, entity_definition->traits_array [i].trait);
+        return BAD_ARGS;
     }
-    
-    
+
+
     return SUCCESS;
 }
 
@@ -1300,19 +1358,21 @@ void  akinator_compare_mode_greetings  (void) {
     printf ("\n");
     printf ("--------------------------------------\n");
     printf ("Enter two entities, i'll compare them!\n");
-    printf ("--------------------------------------\n\n");
+    printf ("--------------------------------------\n\n>> ");
+    speak  ("Enter two entities, i'll compare them!");
 }
 
 
 Return_code akinator_dump_mode (void) {
 
     Tree tree = {};
-    try (TREE_CTOR (&tree, nullptr));
+    TREE_CTOR (&tree, nullptr);
     try (tree_read (&tree));
 
 
     printf ("\n");
     FTREE_GRAPHDUMP (&tree, "Here is your dump:");
+    speak                  ("Here is your dump");
     printf ("\n");
 
 
@@ -1330,6 +1390,11 @@ Return_code akinator_start (void) {
     Akinator_mode mode = get_akinator_mode ();
 
     switch (mode) {
+
+        case AK_EXIT:
+
+            try (akinator_exit_mode ());
+            break;
 
         case AK_GUESS:
 
@@ -1368,11 +1433,14 @@ Return_code akinator_start (void) {
 void akinator_greetings (void) {
 
     printf ("\nWelcome to the akinator.\nChoose one of the following modes:\n\n");
+    speak ("Welcome to the akinator!");
     printf ("[g]uess\n\n");
     printf ("[d]efine\n\n");
     printf ("[c]ompare\n\n");
     printf ("[b]ase dump\n\n");
+    printf ("[e]xit\n\n");
 }
+
 
 Akinator_mode get_akinator_mode (void) {
 
@@ -1385,6 +1453,7 @@ Akinator_mode get_akinator_mode (void) {
 
     if (strcmp (should_be_blank, "")) { return reget_akinator_mode (); }
 
+    if (!stricmp (mode, "e") || !stricmp (mode, "exit"))                                     { return AK_EXIT; }
     if (!stricmp (mode, "g") || !stricmp (mode, "guess"))                                    { return AK_GUESS; }
     if (!stricmp (mode, "d") || !stricmp (mode, "define"))                                   { return AK_DEFINE; }
     if (!stricmp (mode, "c") || !stricmp (mode, "compare"))                                  { return AK_COMPARE; }
@@ -1394,11 +1463,53 @@ Akinator_mode get_akinator_mode (void) {
     return reget_akinator_mode ();
 }
 
+
 Akinator_mode reget_akinator_mode (void) {
 
     printf ("\n\nwrong input, please re-enter akinator mode\n\n");
+    speak  ("wrong input!");
 
 
     return get_akinator_mode ();
+}
+
+
+Return_code akinator_exit_mode (void) {
+
+    if (POLITE_MODE) {
+
+        printf ("\nhave a nice day!\n\n");
+        speak  ("have a nice day!");
+    }
+
+    else {
+
+        printf ("\ngoodbye\n\n");
+        speak  ("goodbye");
+    }
+
+
+    return SUCCESS;
+}
+
+
+void _speak (const char* format, ...) {
+
+    va_list args;
+
+
+    va_start (args, format);
+
+
+    char command    [MAX_COMMAND_LEN] = "";
+    char new_format [MAX_COMMAND_LEN] = "";
+    sprintf (new_format, "espeak -ven+whisper -p0 \" %s \" ", format);
+    vsprintf (command, new_format, args);
+
+
+    va_end (args);
+
+
+    system  (command);
 }
 

@@ -12,6 +12,7 @@
 #include <sys\stat.h>
 #include <locale.h>
 #include <assert.h>
+#include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -27,6 +28,8 @@
 
 
 //-------------------- SETTINGS --------------------
+#define ON_AKINATOR_SPEAK
+
 #define ON_TREE_ERROR_DUMPING
 #define ON_TREE_AFTER_OPERATION_DUMPIN
 
@@ -44,7 +47,7 @@
 
 const size_t GRAPH_WIDTH = 1460;
 
-const bool POLITE_MODE = false;
+const bool POLITE_MODE = true;
 
 const size_t MAX_GRAPH_DUMP_NUM = 100;
 const size_t MAX_QUESTION_LEN   = 100;
@@ -55,7 +58,19 @@ const size_t DEFAULT_COUNTING_SYSTEM = 10;
 
 
 
-#define  TREE_CTOR(x, root_value)  _tree_ctor   (x, #x + (#x[0] == '&'), __FILE__, __PRETTY_FUNCTION__, __LINE__, root_value)
+#define TREE_CTOR(x, ...)\
+\
+    if (!strcmp ("", #__VA_ARGS__)) {\
+\
+        _tree_ctor (x, #x + (#x[0] == '&'), __FILE__, __PRETTY_FUNCTION__, __LINE__, "UNITIALIZED_STRING");\
+    }\
+\
+    else {\
+\
+        _tree_ctor (x, #x + (#x[0] == '&'), __FILE__, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);\
+    }
+
+
 #define FTREE_DUMP(x)              _ftree_dump  (x, tree_dump_file_name, __FILE__, __PRETTY_FUNCTION__, __LINE__)
 
 
@@ -63,8 +78,20 @@ const size_t DEFAULT_COUNTING_SYSTEM = 10;
 \
     _tree_generate_graph_describtion (x);\
     _tree_generate_graph             ();\
-    _ftree_graphdump                 (x, tree_graph_dump_file_name, __FILE__, __PRETTY_FUNCTION__, __LINE__, __VA_ARGS__);\
-    _tree_show_graph_dump            ()
+\
+\
+    if (!strcmp ("", #__VA_ARGS__)) {\
+\
+        _ftree_graphdump (x, tree_graph_dump_file_name, __FILE__, __PRETTY_FUNCTION__, __LINE__, "");\
+    }\
+\
+    else {\
+\
+        _ftree_graphdump (x, tree_graph_dump_file_name, __FILE__, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);\
+    }\
+\
+\
+    _tree_show_graph_dump ()
 
 
 #ifdef ON_TREE_ERROR_DUMPING
@@ -89,6 +116,13 @@ const size_t DEFAULT_COUNTING_SYSTEM = 10;
 #endif
 
 
+#ifdef ON_AKINATOR_SPEAK
+    #define speak(x, ...) _speak(x, ##__VA_ARGS__)
+#else
+    #define speak(x, ...)
+#endif
+
+
 
 typedef int Tree_state;
 enum        Tree_state_flags  {
@@ -110,11 +144,12 @@ enum User_answer {
 
 enum Akinator_mode {
 
-    AK_GUESS   = 0,
-    AK_DEFINE  = 1,
-    AK_COMPARE = 2,
-    AK_DUMP    = 3,
-    AK_UNKNOWN = 4,
+    AK_EXIT    = 0,
+    AK_UNKNOWN = 1,
+    AK_GUESS   = 2,
+    AK_DEFINE  = 3,
+    AK_COMPARE = 4,
+    AK_DUMP    = 5,
 };
 
 
@@ -238,6 +273,8 @@ void         akinator_compare_mode_out       (Stack* stack);
 
 Return_code akinator_dump_mode (void);
 
+Return_code akinator_exit_mode (void);
+
 
 Return_code   akinator_start      (void);
 void          akinator_greetings  (void);
@@ -253,7 +290,7 @@ Return_code entity_definition_ctor    (Entity_definition* entity_definition, Sta
 Return_code entity_definition_dtor    (Entity_definition* entity_definition);
 Return_code entity_definition_builder (Entity_definition* entity_definition, Tree* tree, char* character);
 
-
+void _speak (const char* format, ...);
 
 
 
