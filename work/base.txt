@@ -1,4 +1,4 @@
-{consider himself a human being
+{walk on two legs
     {get eaten by people
         {poltorashka}
         {shaurma}
@@ -6,7 +6,7 @@
     {teach at mipt
         {vlad z}
         {teach computer science
-            {sing songs
+            {make slivi
                 {teach seminars
                     {shtepin}
                     {teach calculus

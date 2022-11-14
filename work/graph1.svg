@@ -14,7 +14,7 @@
 <g id="node2" class="node">
 <title>node0_0</title>
 <path fill="#8bbfec" stroke="#8bbfec" d="M93.33,-308.5C93.33,-308.5 131.67,-308.5 131.67,-308.5 132.83,-308.5 134,-309.67 134,-310.83 134,-310.83 134,-313.17 134,-313.17 134,-314.33 132.83,-315.5 131.67,-315.5 131.67,-315.5 93.33,-315.5 93.33,-315.5 92.17,-315.5 91,-314.33 91,-313.17 91,-313.17 91,-310.83 91,-310.83 91,-309.67 92.17,-308.5 93.33,-308.5"/>
-<text text-anchor="middle" x="112.5" y="-311.1" font-family="Times New Roman,serif" font-size="3.00">consider himself a human being</text>
+<text text-anchor="middle" x="112.5" y="-311.1" font-family="Times New Roman,serif" font-size="3.00">walk on two legs</text>
 </g>
 <!-- above_node&#45;&gt;node0_0 -->
 <!-- node1_0 -->
@@ -93,7 +93,7 @@
 <g id="node9" class="node">
 <title>node3_0</title>
 <path fill="#8bbfec" stroke="#8bbfec" d="M154.33,-176.5C154.33,-176.5 192.67,-176.5 192.67,-176.5 193.83,-176.5 195,-177.67 195,-178.83 195,-178.83 195,-181.17 195,-181.17 195,-182.33 193.83,-183.5 192.67,-183.5 192.67,-183.5 154.33,-183.5 154.33,-183.5 153.17,-183.5 152,-182.33 152,-181.17 152,-181.17 152,-178.83 152,-178.83 152,-177.67 153.17,-176.5 154.33,-176.5"/>
-<text text-anchor="middle" x="173.5" y="-179.1" font-family="Times New Roman,serif" font-size="3.00">sing songs</text>
+<text text-anchor="middle" x="173.5" y="-179.1" font-family="Times New Roman,serif" font-size="3.00">make slivi</text>
 </g>
 <!-- node2_3&#45;&gt;node3_0 -->
 <g id="edge7" class="edge">

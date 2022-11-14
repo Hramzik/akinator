@@ -763,7 +763,7 @@ void  akinator_guess_mode_lose_message  (void) {
     if (POLITE_MODE) {
 
         printf ("\nkeep your secrets...\n\n");
-        speak  ("\nkeep your secrets...");
+        speak  ("keep your secrets...");
     }
 
     else {
@@ -1218,6 +1218,8 @@ Return_code  akinator_compare_mode  (void) {
     gets (character2);
     Entity_definition character2_definition = {nullptr, 0};
 
+    printf ("\n--------------------------------------\n");
+
 
 
     Tree tree = {};
@@ -1242,13 +1244,21 @@ Return_code  akinator_compare_mode  (void) {
         }
     }
 
-    printf ("\n--------------------------------------\n");
-    printf ("both %s and %s:\n\n", character1, character2);
-    speak  ("both %s and %s:",     character1, character2);
+
+    bool seen_common_trait = false;
 
     for (size_t i = 0; i < character1_definition.num_traits; i++) {
     
         if (!character1_definition.traits_array[i].have_both) { continue; }
+
+
+        if (!seen_common_trait) {
+
+                printf ("both %s and %s:\n\n", character1, character2);
+                speak  ("both %s and %s:",     character1, character2);
+
+                seen_common_trait = true;
+        }
 
 
         if (character1_definition.traits_array[i].has_it) {
@@ -1267,8 +1277,18 @@ Return_code  akinator_compare_mode  (void) {
 
     if (character1_definition.num_traits) {
 
-        printf ("but %s:\n\n", character1);
-        speak  ("but %s",      character1);
+        if (seen_common_trait) {
+
+            printf ("but %s:\n\n", character1);
+            speak  ("but %s",      character1);
+        }
+
+        else {
+
+            printf ("%s:\n\n", character1);
+            speak  ("%s",      character1);
+        }
+
 
         for (size_t i = 0; i < character1_definition.num_traits; i++) {
 
@@ -1291,8 +1311,18 @@ Return_code  akinator_compare_mode  (void) {
 
     if (character2_definition.num_traits) {
 
-        printf ("and %s:\n\n", character2);
-        speak  ("and %s",      character2);
+        if (seen_common_trait) {
+
+            printf ("and %s:\n\n", character2);
+            speak  ("and %s",      character2);
+        }
+
+        else {
+
+            printf ("but %s:\n\n", character2);
+            speak  ("but %s",      character2);
+        }
+
 
         for (size_t i = 0; i < character2_definition.num_traits; i++) {
 
@@ -1442,6 +1472,7 @@ void akinator_greetings (void) {
     printf ("[c]ompare\n\n");
     printf ("[b]ase dump\n\n");
     printf ("[e]xit\n\n");
+    printf (">> ");
 }
 
 
