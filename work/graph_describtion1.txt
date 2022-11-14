@@ -7,67 +7,13 @@ digraph G {
     {rank = min; above_node [width = 3, style = invis];}
 
     {
-        node0_0 [style = "rounded, filled", color="#8bbfec", label = "walk on two legs"];
-
-        node0_0 -> node1_0
-        node0_0 -> node1_1
-    }
-    {
-        node1_0 [style = "rounded, filled", color="#8bbfec", label = "get eaten by people"];
-
-        node1_0 -> node2_0
-        node1_0 -> node2_1
-        node1_1 [style = "rounded, filled", color="#8bbfec", label = "teach at mipt"];
-
-        node1_1 -> node2_2
-        node1_1 -> node2_3
-    }
-    {
-        node2_0 [style = "rounded, filled", color="#88CDBE", label = "poltorashka"];
-
-        node2_1 [style = "rounded, filled", color="#88CDBE", label = "shaurma"];
-
-        node2_2 [style = "rounded, filled", color="#88CDBE", label = "vlad z"];
-
-        node2_3 [style = "rounded, filled", color="#8bbfec", label = "teach computer science"];
-
-        node2_3 -> node3_0
-        node2_3 -> node3_1
-    }
-    {
-        node3_0 [style = "rounded, filled", color="#8bbfec", label = "make slivi"];
-
-        node3_0 -> node4_0
-        node3_0 -> node4_1
-        node3_1 [style = "rounded, filled", color="#88CDBE", label = "ded"];
-
-    }
-    {
-        node4_0 [style = "rounded, filled", color="#8bbfec", label = "teach seminars"];
-
-        node4_0 -> node5_0
-        node4_0 -> node5_1
-        node4_1 [style = "rounded, filled", color="#88CDBE", label = "ovchinkin"];
-
-    }
-    {
-        node5_0 [style = "rounded, filled", color="#88CDBE", label = "shtepin"];
-
-        node5_1 [style = "rounded, filled", color="#8bbfec", label = "teach calculus"];
-
-        node5_1 -> node6_0
-        node5_1 -> node6_1
-    }
-    {
-        node6_0 [style = "rounded, filled", color="#88CDBE", label = "bogdanov"];
-
-        node6_1 [style = "rounded, filled", color="#88CDBE", label = "redkozubov"];
+        node0_0 [style = "rounded, filled", color="#88CDBE", label = "UNITIALIZED_STRING"];
 
     }
 
 
     {rank = max; below_node[width = 3, style = invis]; }
 
-    above_node -> node0_0 [style = invis]; below_node -> node6_0 [style = invis];
+    above_node -> node0_0 [style = invis]; below_node -> node0_0 [style = invis];
 
 }

@@ -1,5 +1,6 @@
 
 
+#include "../lib/onegin.hpp"
 #include "../lib/stack.hpp"
 #include "../lib/logs.hpp"
 
@@ -509,33 +510,43 @@ Return_code  tree_read  (Tree* tree, const char* file_name) {
     if (!file) { LOG_ERROR (FILE_ERR); return FILE_ERR; }
 
 
-    _node_read (file, tree, tree->root);
+    size_t file_len = get_file_len (file);
+    char buffer [ file_len + 1] = "";
+    fread (buffer, 1, file_len, file);
 
 
     fclose (file);
+
+
+    size_t current = 0;
+    _node_read (buffer, &current, tree, tree->root);
 
 
     return SUCCESS;
 }
 
 
-Return_code  _node_read  (FILE* file, Tree* tree, Node* node) {
+Return_code  _node_read  (char* buffer, size_t* current, Tree* tree, Node* node) {
 
-    if (!file || !node) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
+    if (!buffer || !tree || !node) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-    while (fgetc (file) != '{') { continue; }
+    while (buffer [*current] != '{') { *current += 1; }
+    *current += 1;
 
 
     size_t num_read_sons = 0;
     bool read_question = false;
     char* question = (char*) calloc (MAX_QUESTION_LEN, 1);
     question [0]   = '\0';
+    size_t question_len = 0;
+
     int c = 1;
 
     while (c != EOF) {
 
-        c = fgetc (file);
+        c = buffer [*current];
+        *current += 1;
 
         if (c == '}') {
 
@@ -548,18 +559,18 @@ Return_code  _node_read  (FILE* file, Tree* tree, Node* node) {
             if (num_read_sons >= 2) { LOG_ERROR (BAD_ARGS); return BAD_ARGS; }
 
 
-            ungetc (c, file);
+            *current -= 1;
 
             if (num_read_sons == 1) { //already read left son
 
                 tree_push_right (tree, node, nullptr);
-                _node_read      (file, tree, node->right_son);
+                _node_read      (buffer, current, tree, node->right_son);
                 num_read_sons += 1;
                 continue;
             }
 
             tree_push_left (tree, node, nullptr); //reading left son
-            _node_read     (file, tree, node->left_son);
+            _node_read     (buffer, current, tree, node->left_son);
             num_read_sons += 1;
             continue;
         }
@@ -568,8 +579,9 @@ Return_code  _node_read  (FILE* file, Tree* tree, Node* node) {
 
         if (!read_question) {
 
-            question [strlen (question) + 1] = '\0';
-            question [strlen (question)]     = (char) c;
+            question [question_len + 1] = '\0';
+            question [question_len]     = (char) c;
+            question_len += 1;
         }
     }
 

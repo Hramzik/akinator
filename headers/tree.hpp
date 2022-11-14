@@ -240,7 +240,7 @@ void         _tree_generate_graph             (void);
 
 Return_code  tree_save (Tree* tree, const char* file_name = tree_default_save_file_name);
 Return_code  tree_read (Tree* tree, const char* file_name = tree_default_save_file_name);
-Return_code _node_read (FILE* file, Tree* tree, Node* node);
+Return_code _node_read (char* buffer, size_t* current, Tree* tree, Node* node);
 
 Return_code tree_iterator_inc            (Tree_iterator* tree_iterator);
 Return_code _tree_iterator_inc_in_order  (Tree_iterator* tree_iterator);
